@@ -1,6 +1,7 @@
 import React from 'react'
 import {
   Dimensions,
+  ImageBackground,
   StyleProp,
   StyleSheet,
   Text,
@@ -10,24 +11,35 @@ import {
 
 type Props = {
   title: string
+  imageUrl: string
 
   style?: StyleProp<ViewStyle>
 }
 
-const Card = ({ title, style }: Props): JSX.Element => {
+const Card = ({ title, imageUrl, style }: Props): JSX.Element => {
   return (
-    <View style={[styles.container, style]}>
-      <Text>{title}</Text>
-    </View>
+    <ImageBackground
+      source={{ uri: imageUrl }}
+      style={[styles.container, style]}
+    >
+      <Text style={styles.title}>{title}</Text>
+    </ImageBackground>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 8,
+    borderRadius: 32,
+    overflow: 'hidden',
     backgroundColor: 'red',
-    width: Dimensions.get('window').width - 64,
+    padding: 16,
+    width: 320,
     height: 320,
+    justifyContent: 'flex-end'
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: '500',
   },
 })
 

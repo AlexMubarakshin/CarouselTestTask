@@ -11,6 +11,7 @@ type Props = {
 }
 
 const CARD_WIDTH = Device.screen.width - 64
+const CARD_HEIGHT = Device.screen.height - 220
 const SWIPE_THRESHOLD = 0.25 * Device.screen.width
 const SWIPE_DURATION = 250
 
@@ -72,7 +73,12 @@ const Carousel = ({ events }: Props) => {
       {..._panResponder.panHandlers}
     >
       {events.map(event => (
-        <Card key={event.id} title={event.title} style={styles.card} />
+        <Card
+          key={event.id}
+          title={event.title}
+          imageUrl={event.imageUrl}
+          style={styles.card}
+        />
       ))}
     </Animated.View>
   )
@@ -83,6 +89,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   card: {
+    height: CARD_HEIGHT,
     width: CARD_WIDTH,
   },
 })
