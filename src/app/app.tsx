@@ -1,10 +1,12 @@
 import React from 'react'
+import { LogBox } from 'react-native'
 
 import { SafeAreaProvider } from './providers'
 import { HomeScreen } from '../screens'
 
 const App: React.FC = () => {
-  console.disableYellowBox = true
+  LogBox.ignoreAllLogs()
+
   return (
     <SafeAreaProvider>
       <HomeScreen />

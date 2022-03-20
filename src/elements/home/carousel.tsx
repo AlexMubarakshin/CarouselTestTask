@@ -10,7 +10,8 @@ type Props = {
   events: LocationEvent[]
 }
 
-const CARD_WIDTH = Device.screen.width - 64
+const CAROUSEL_INNER_PADDING = 16
+const CARD_WIDTH = Device.screen.width - CAROUSEL_INNER_PADDING * 2
 const CARD_HEIGHT = Device.screen.height - 220
 const SWIPE_THRESHOLD = 0.25 * Device.screen.width
 const SWIPE_DURATION = 250
@@ -22,42 +23,85 @@ enum Direction {
 
 const Carousel = ({ events }: Props) => {
   const position = useRef(new Animated.Value(0)).current
+  const value = useRef(0)
+
+  React.useEffect(() => {
+    position.addListener(_value => (value.current = _value.value))
+  }, [])
 
   const forceSwipe = (direction: Direction) => {
-    // TODO: Implement swipe on release
-    // const x = direction === Direction.RIGHT ? CARD_WIDTH : -CARD_WIDTH
+    console.log('SWIPE', direction)
+
+    // if (direction === Direction.LEFT) {
+    //   forceReset()
     //
-    // Animated.timing(position, {
-    //   toValue: x,
-    //   duration: SWIPE_DURATION,
-    //   useNativeDriver: true,
-    // }).start()
+    //   return
+    // }
+
+    // if (direction === Direction.RIGHT) {
+    //   Animated.timing(position, {
+    //     toValue: CAROUSEL_INNER_PADDING,
+    //     duration: 250,
+    //     useNativeDriver: true,
+    //   }).start()
+    // }
+
+    const nextIndex = direction === Direction.RIGHT ? -1 : 1
+
+    const nextOffsetX = Device.screen.width * nextIndex + CAROUSEL_INNER_PADDING
+
+    console.log({ position, nextOffsetX })
+
+    Animated.spring(position, {
+      toValue: nextOffsetX,
+      useNativeDriver: false,
+    }).start()
   }
 
   const forceReset = () => {
-    // TODO: Implement this
+    Animated.timing(position, {
+      toValue: 0,
+      duration: 250,
+      useNativeDriver: false,
+    }).start()
   }
 
   const _panResponder = React.useRef(
     PanResponder.create({
-      onMoveShouldSetResponderCapture: () => true,
-      onMoveShouldSetPanResponderCapture: () => true,
-      onPanResponderMove: Animated.event([null, { dx: position }]),
-      onPanResponderRelease: (e, { dx }) => {
-        const isSwipeLeft = dx < -SWIPE_THRESHOLD
-        const isSwipeRight = dx > SWIPE_THRESHOLD
+      onMoveShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: () => true,
 
-        if (isSwipeRight) {
-          forceSwipe(Direction.RIGHT)
-        }
-
-        if (isSwipeLeft) {
-          forceSwipe(Direction.LEFT)
-        }
-
-        if (!isSwipeLeft && !isSwipeRight) {
-          forceReset()
-        }
+      // onPanResponderMove: Animated.event([null, { dx: position }]),
+      onPanResponderGrant: (e, gesture) => {
+        console.log('SET OFFSET', value.current)
+        position.setOffset(value.current)
+        position.setValue(0)
+      },
+      onPanResponderMove: Animated.event([null, { dx: position }], {
+        useNativeDriver: false,
+      }),
+      onPanResponderRelease: (e, gesture) => {
+        position.flattenOffset()
+        // const isSwipeRight = gesture.dx < -SWIPE_THRESHOLD
+        // const isSwipeLeft = gesture.dx > SWIPE_THRESHOLD
+        //
+        // if (isSwipeRight) {
+        //   position.extractOffset()
+        //
+        //   forceSwipe(Direction.RIGHT)
+        // }
+        //
+        // if (isSwipeLeft) {
+        //   position.extractOffset()
+        //
+        //   forceSwipe(Direction.LEFT)
+        // }
+        //
+        // if (!isSwipeLeft && !isSwipeRight) {
+        //   // position.flattenOffset()
+        //
+        //   forceReset()
+        // }
       },
     }),
   ).current
@@ -72,12 +116,18 @@ const Carousel = ({ events }: Props) => {
       ]}
       {..._panResponder.panHandlers}
     >
-      {events.map(event => (
+      {events.map((event, index) => (
         <Card
           key={event.id}
           title={event.title}
           imageUrl={event.imageUrl}
-          style={styles.card}
+          style={[
+            styles.card,
+            {
+              marginRight:
+                index !== events.length - 1 ? CAROUSEL_INNER_PADDING : 0,
+            },
+          ]}
         />
       ))}
     </Animated.View>
@@ -87,6 +137,7 @@ const Carousel = ({ events }: Props) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
+    paddingHorizontal: CAROUSEL_INNER_PADDING,
   },
   card: {
     height: CARD_HEIGHT,

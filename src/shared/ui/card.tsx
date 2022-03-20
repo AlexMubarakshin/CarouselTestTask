@@ -1,11 +1,9 @@
 import React from 'react'
 import {
-  Dimensions,
   ImageBackground,
   StyleProp,
   StyleSheet,
   Text,
-  View,
   ViewStyle,
 } from 'react-native'
 
@@ -31,11 +29,11 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 32,
     overflow: 'hidden',
-    backgroundColor: 'red',
+    backgroundColor: '#e9e9e9',
     padding: 16,
     width: 320,
     height: 320,
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-end',
   },
   title: {
     fontSize: 32,
