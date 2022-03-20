@@ -47,11 +47,10 @@ const Carousel = ({ events }: Props) => {
       onPanResponderRelease: (e, { vx }) => {
         const _index = Math.max(
           0,
-          Math.min(
-            events.length - 1,
-            (currentIndex.current + 1) * -Math.sign(vx),
-          ),
+          Math.min(events.length - 1, currentIndex.current - Math.sign(vx)),
         )
+
+        console.log({ _index })
         currentIndex.current = _index
 
         Animated.spring(position, {
